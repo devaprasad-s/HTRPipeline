@@ -60,5 +60,5 @@ gr.Interface(fn=process_page,
              outputs=[gr.Textbox(label='Read Text'), gr.Image(label='Visualization')],
              examples=examples,
              allow_flagging='never',
-             title='Detect and Read Handwritten Words',
-             theme=gr.themes.Monochrome()).launch()
+             title='Person Identification Using Handwriting Analysis',
+             theme=gr.themes.Glass()).launch()
