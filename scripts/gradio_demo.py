@@ -10,12 +10,12 @@ with open('data/words_alpha.txt') as f:
 prefix_tree = PrefixTree(word_list)
 
 
-def process_page(img, scale, margin, use_dictionary, min_words_per_line, text_scale):
+def process_page(img, scale, margin):
     # read page
     read_lines = read_page(img,
                            detector_config=DetectorConfig(scale=scale, margin=margin),
-                           line_clustering_config=LineClusteringConfig(min_words_per_line=min_words_per_line),
-                           reader_config=ReaderConfig(decoder='word_beam_search' if use_dictionary else 'best_path',
+                           line_clustering_config=LineClusteringConfig(min_words_per_line=2),
+                           reader_config=ReaderConfig(decoder='word_beam_search',
                                                       prefix_tree=prefix_tree))
 
     # create text to show
@@ -36,10 +36,10 @@ def process_page(img, scale, margin, use_dictionary, min_words_per_line, text_sc
                         read_word.text,
                         (aabb.xmin, aabb.ymin + aabb.height // 2),
                         cv2.FONT_HERSHEY_SIMPLEX,
-                        text_scale,
+                        0.5,
                         color=(255, 0, 0))
 
-    return res, img
+    return res
 
 
 with open('data/config.json') as f:
@@ -51,14 +51,10 @@ for k, v in config.items():
 
 # define gradio interface
 gr.Interface(fn=process_page,
-             inputs=[gr.Image(label='Input image'),
+             inputs=[gr.Image(label='Input image',show_label=False),
                      gr.Slider(0, 10, 1, step=0.01, label='Scale'),
-                     gr.Slider(0, 25, 1, step=1, label='Margin'),
-                     gr.Checkbox(value=False, label='Use dictionary'),
-                     gr.Slider(1, 10, 1, step=1, label='Minimum number of words per line'),
-                     gr.Slider(0.5, 2, 1, label='Text size in visualization')],
-             outputs=[gr.Textbox(label='Read Text'), gr.Image(label='Visualization')],
-             examples=examples,
+                     gr.Slider(0, 25, 1, step=1, label='Margin'),],
+             outputs=gr.Textbox(label='Read Text'),
              allow_flagging='never',
              title='Person Identification Using Handwriting Analysis',
-             theme=gr.themes.Glass()).launch()
+             theme=gr.themes.Monochrome()).launch()
